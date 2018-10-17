@@ -43,7 +43,13 @@ namespace Framework
 
 			public override void OnLogicFinished(StateMachineComponent stateMachine)
 			{
+				CinematicCameraMixer camera = _camera.GetComponent();
+				CinematicCameraShot cameraShot = _shot.GetComponent();
 
+				if (camera != null && cameraShot != null)
+				{
+					camera.StopCameraShot(cameraShot);
+				}
 			}
 
 			public override void UpdateLogic(StateMachineComponent stateMachine)

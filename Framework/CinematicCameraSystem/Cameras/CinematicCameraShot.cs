@@ -13,6 +13,7 @@ namespace Framework
 			public float _fieldOfView = 60.0f;
 			public Rect _cameraRect = new Rect(0, 0, 1, 1);
 			public CinematicCameraFocusInfo _focusInfo = CinematicCameraFocusInfo.kDefault;
+			public CinematicCameraShotModifier[] _cinematicCameraShotModifiers;
 
 			public enum eShotType
 			{
@@ -21,6 +22,8 @@ namespace Framework
 				Rail,
 			}
 			public eShotType _shotType;
+
+			#region Auto Pan
 			[Flags]
 			public enum eAutoPanFlags
 			{
@@ -57,7 +60,9 @@ namespace Framework
 			}
 			public eAutoZoomStyle _autoZoomStyle;
 			public float _autoZoomAmount;
+			#endregion
 
+			#region Previewing
 #if UNITY_EDITOR
 			[HideInInspector]
 			public CinematicCamera _previewCamera;
@@ -66,6 +71,8 @@ namespace Framework
 			[HideInInspector]
 			public eExtrapolation _previewClipExtrapolation;
 #endif
+			#endregion
+
 			#endregion
 
 			#region MonoBehaviour
@@ -91,21 +98,7 @@ namespace Framework
 			#region Public Functions
 			public CinematicCameraState GetState(float clipPosition = 0.0f)
 			{
-				switch (_shotType)
-				{
-					case eShotType.AutoPan:
-						return GetAutoPanState(clipPosition);
-					case eShotType.Static:
-					default:
-						return GetAutoPanState(clipPosition);
-
-				}
-			}
-			#endregion
-
-			#region Private Functions
-			private CinematicCameraState GetStaticState(float clipPosition)
-			{
+				//Get default state
 				CinematicCameraState state = new CinematicCameraState
 				{
 					_position = this.transform.position,
@@ -115,13 +108,30 @@ namespace Framework
 					_focusInfo = this._focusInfo
 				};
 
+				//Apply pan or rail
+				switch (_shotType)
+				{
+					case eShotType.AutoPan:
+						ApplyAutoPan(ref state, clipPosition);
+						break;
+					case eShotType.Rail:
+						ApplyRailShot(ref state, clipPosition);
+						break;
+				}
+
+				//Finally apply modifiers
+				for (int i=0; i<_cinematicCameraShotModifiers.Length; i++)
+				{
+					_cinematicCameraShotModifiers[i].ModifiyState(ref state);
+				}
+
 				return state;
 			}
+			#endregion
 
-			private CinematicCameraState GetAutoPanState(float clipPosition)
+			#region Private Functions
+			private void ApplyAutoPan(ref CinematicCameraState state, float clipPosition)
 			{
-				CinematicCameraState state = GetStaticState(0.0f);
-
 				if ((_autoPanFlags & eAutoPanFlags.Zoom) == eAutoPanFlags.Zoom)
 				{
 					ApplyAutoPanZoom(ref state, clipPosition);
@@ -136,8 +146,6 @@ namespace Framework
 				{
 					ApplyAutoPanTranslation(ref state, clipPosition);
 				}
-
-				return state;
 			}
 
 			private void ApplyAutoPanZoom(ref CinematicCameraState state, float clipPosition)
@@ -233,6 +241,11 @@ namespace Framework
 						}
 						break;
 				}
+			}
+
+			private void ApplyRailShot(ref CinematicCameraState state, float clipPosition)
+			{
+				
 			}
 			#endregion
 		}

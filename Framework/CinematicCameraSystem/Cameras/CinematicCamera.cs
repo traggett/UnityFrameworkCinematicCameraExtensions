@@ -1,8 +1,5 @@
 using UnityEngine;
 
-using Framework.Utils;
-using Framework.Maths;
-
 namespace Framework
 {
 	namespace CinematicCameraSystem

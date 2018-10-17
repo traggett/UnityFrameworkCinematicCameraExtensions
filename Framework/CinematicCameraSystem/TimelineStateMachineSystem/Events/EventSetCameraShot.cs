@@ -62,7 +62,17 @@ namespace Framework
 				return eEventTriggerReturn.EventOngoing;
 			}
 
-			public void End(StateMachineComponent stateMachine) { }
+			public void End(StateMachineComponent stateMachine)
+			{
+				CinematicCameraMixer camera = _camera.GetComponent();
+				CinematicCameraShot cameraShot = _shot.GetComponent();
+
+				if (camera != null && cameraShot != null)
+				{
+					camera.StopCameraShot(cameraShot);
+				}
+			}
+
 #if UNITY_EDITOR
 			public StateMachineEditorLink[] GetEditorLinks() { return null; }
 #endif

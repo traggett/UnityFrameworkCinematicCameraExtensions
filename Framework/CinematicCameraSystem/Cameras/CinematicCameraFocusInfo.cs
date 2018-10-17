@@ -19,7 +19,7 @@ namespace Framework
 			//Makes the range of distances in focus bigger / smaller
 			public float _focusPointFNumber;
 
-			public static readonly CinematicCameraFocusInfo kDefault = new CinematicCameraFocusInfo(2.5f, 0.075f, 5.0f);
+			public static readonly CinematicCameraFocusInfo kDefault = new CinematicCameraFocusInfo(2.5f, 0.075f, 16.0f);
 			#endregion
 
 			public CinematicCameraFocusInfo(float focusPointDistance, float focusPointFocalLength, float focusPointFNumber)

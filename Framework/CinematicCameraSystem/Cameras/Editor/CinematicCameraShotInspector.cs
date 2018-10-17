@@ -20,6 +20,7 @@ namespace Framework
 				private SerializedProperty _focusInfoProperty;
 
 				private SerializedProperty _shotTypeProperty;
+				private SerializedProperty _shotModifiersProperty;
 
 				private SerializedProperty _autoPanFlagsProperty;
 				private SerializedProperty _autoPanStyleProperty;
@@ -55,6 +56,7 @@ namespace Framework
 					_focusInfoProperty = serializedObject.FindProperty("_focusInfo");
 
 					_shotTypeProperty = serializedObject.FindProperty("_shotType");
+					_shotModifiersProperty = serializedObject.FindProperty("_cinematicCameraShotModifiers");
 
 					_autoPanFlagsProperty = serializedObject.FindProperty("_autoPanFlags");
 					_autoPanStyleProperty = serializedObject.FindProperty("_autoPanStyle");
@@ -83,7 +85,7 @@ namespace Framework
 
 				public override void OnInspectorGUI()
 				{
-					EditorGUILayout.LabelField("Camera Properties", EditorUtils.InspectorHeaderStyle);
+					EditorGUILayout.LabelField("<b>Camera Properties</b>", EditorUtils.InspectorSubHeaderStyle);
 					EditorGUILayout.Separator();
 
 					EditorGUILayout.PropertyField(_fieldOfViewProperty);
@@ -91,9 +93,9 @@ namespace Framework
 					EditorGUILayout.PropertyField(_focusInfoProperty);
 
 					EditorGUILayout.Separator();
-					EditorGUILayout.LabelField("Shot Properties", EditorUtils.InspectorHeaderStyle);
+					EditorGUILayout.LabelField("<b>Shot Properties</b>", EditorUtils.InspectorSubHeaderStyle);
 					EditorGUILayout.Separator();
-
+					
 					EditorGUILayout.PropertyField(_shotTypeProperty);
 
 					CinematicCameraShot.eShotType shotType = (CinematicCameraShot.eShotType )_shotTypeProperty.enumValueIndex;
@@ -109,7 +111,13 @@ namespace Framework
 					}
 
 					EditorGUILayout.Separator();
-					EditorGUILayout.LabelField("Editor Preview", EditorUtils.InspectorHeaderStyle);
+					EditorGUILayout.LabelField("<b>Modifiers</b>", EditorUtils.InspectorSubHeaderStyle);
+					EditorGUILayout.Separator();
+
+					EditorGUILayout.PropertyField(_shotModifiersProperty, true);
+
+					EditorGUILayout.Separator();
+					EditorGUILayout.LabelField("<b>Editor Preview</b>", EditorUtils.InspectorSubHeaderStyle);
 					EditorGUILayout.Separator();
 					CinematicCamera oldPreviewCamera = (CinematicCamera)_previewCameraProperty.objectReferenceValue;
 					CinematicCamera previewCamera = oldPreviewCamera;
