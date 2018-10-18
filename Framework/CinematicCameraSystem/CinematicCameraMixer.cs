@@ -70,7 +70,7 @@ namespace Framework
 						for (int i = 1; i < _blendingShots.Length; i++)
 						{
 							_blendingShots[i]._time += Time.deltaTime;
-							blendedState = blendedState.Interpolate(_camera, _blendingShots[i].GetState(), _blendingShots[i]._blendType, _blendingShots[i]._weight);
+							blendedState = CinematicCameraState.Interpolate(_camera, blendedState, _blendingShots[i].GetState(), _blendingShots[i]._blendType, _blendingShots[i]._weight);
 						}
 					}
 					else
@@ -80,7 +80,7 @@ namespace Framework
 
 					if (_currentShot._shot != null)
 					{
-						blendedState = blendedState.Interpolate(_camera, _currentShot.GetState(), _currentShot._blendType, _currentShot._weight);
+						blendedState = CinematicCameraState.Interpolate(_camera, blendedState, _currentShot.GetState(), _currentShot._blendType, _currentShot._weight);
 					}
 
 					_camera.SetState(blendedState);

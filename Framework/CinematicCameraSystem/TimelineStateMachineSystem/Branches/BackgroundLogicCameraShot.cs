@@ -24,7 +24,7 @@ namespace Framework
 #if UNITY_EDITOR
 			public override string GetDescription()
 		{
-			return "<b>Camera Shot</b>";
+			return "<b>" + _shot + "</b>";
 		}
 #endif
 			#endregion

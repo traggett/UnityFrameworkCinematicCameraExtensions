@@ -25,15 +25,13 @@ namespace Framework
 			
 			public virtual CinematicCameraState GetState()
 			{
-				CinematicCameraState state = new CinematicCameraState
-				{
-					_position = this.transform.position,
-					_rotation = this.transform.rotation,
-					_cameraRect = GetCamera().rect,
-					_fieldOfView = GetCamera().fieldOfView,
-					_focusInfo = this._focusInfo
-				};
-				return state;
+				return new CinematicCameraState(
+					this.transform.position,
+					this.transform.rotation,
+					GetCamera().fieldOfView,
+					GetCamera().rect,
+					this._focusInfo
+					);
 			}
 
 			public virtual void SetState(CinematicCameraState state)

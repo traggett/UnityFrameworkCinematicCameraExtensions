@@ -42,37 +42,43 @@ namespace Framework
 				float totalWeights = 0.0f;
 				CinematicCameraState[] states = new CinematicCameraState[numInputs];
 
-				for (int i=0; i< numInputs; i++)
+				for (int i = 0; i < numInputs; i++)
 				{
-					inputWeights[i] = playable.GetInputWeight(i);
+					ScriptPlayable<CinematicCameraPlayableBehaviour> scriptPlayable = (ScriptPlayable<CinematicCameraPlayableBehaviour>)playable.GetInput(i);
+					CinematicCameraPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
 
-					if (inputWeights[i] > 0.0f)
+					if (inputBehaviour != null && inputBehaviour._cameraShot != null)
 					{
-						ScriptPlayable<CinematicCameraPlayableBehaviour> scriptPlayable = (ScriptPlayable<CinematicCameraPlayableBehaviour>)playable.GetInput(i);
-						CinematicCameraPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
+						float inputWeight = playable.GetInputWeight(i);
 
-						if (inputBehaviour != null)
+						if (inputWeight > 0.0f)
 						{
 							TimelineClip clip = _trackAsset.GetClip(inputBehaviour._clipAsset);
 
-							double clipStart = clip.hasPreExtrapolation ? clip.extrapolatedStart : clip.start;
-							double clipDuration = clip.hasPreExtrapolation || clip.hasPostExtrapolation ? clip.extrapolatedDuration : clip.duration;
-							
-							if (inputBehaviour._cameraShot != null && _director.time >= clipStart && _director.time <= clipStart + clipDuration)
+							if (clip != null)
 							{
-								eExtrapolation extrapolation = eExtrapolation.Hold;
+								double clipStart = clip.hasPreExtrapolation ? clip.extrapolatedStart : clip.start;
+								double clipDuration = clip.hasPreExtrapolation || clip.hasPostExtrapolation ? clip.extrapolatedDuration : clip.duration;
 
-								if (clip.hasPreExtrapolation && _director.time < clip.start)
-									extrapolation = GetExtrapolation(clip.preExtrapolationMode);
-								else if (clip.hasPostExtrapolation && _director.time > clip.start + clip.duration)
-									extrapolation = GetExtrapolation(clip.postExtrapolationMode);
+								if (_director.time >= clipStart && _director.time <= clipStart + clipDuration)
+								{
+									inputWeights[i] = inputWeight;
 
-								float clipPosition = CinematicCameraMixer.GetClipPosition(extrapolation, (float)(_director.time - clip.start), (float)clip.duration);
+									eExtrapolation extrapolation = eExtrapolation.Hold;
 
-								states[i] = inputBehaviour._cameraShot.GetState(clipPosition);
+									if (clip.hasPreExtrapolation && _director.time < clip.start)
+										extrapolation = GetExtrapolation(clip.preExtrapolationMode);
+									else if (clip.hasPostExtrapolation && _director.time > clip.start + clip.duration)
+										extrapolation = GetExtrapolation(clip.postExtrapolationMode);
+
+									float clipPosition = CinematicCameraMixer.GetClipPosition(extrapolation, (float)(_director.time - clip.start), (float)clip.duration);
+
+									states[i] = inputBehaviour._cameraShot.GetState(clipPosition);
+
+
+									totalWeights += inputWeights[i];
+								}
 							}
-
-							totalWeights += inputWeights[i];
 						}
 					}
 				}
@@ -95,7 +101,7 @@ namespace Framework
 							}
 							else
 							{
-								blendedState = blendedState.Interpolate(_trackBinding, states[i], eInterpolation.Linear, inputWeights[i] * weightAdjust);
+								blendedState = CinematicCameraState.Interpolate(_trackBinding, blendedState, states[i], eInterpolation.Linear, inputWeights[i] * weightAdjust);
 							}
 						}
 					}
