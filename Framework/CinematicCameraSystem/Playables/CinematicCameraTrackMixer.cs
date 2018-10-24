@@ -13,7 +13,6 @@ namespace Framework
 		{
 			private CinematicCameraTrack _trackAsset;
 			private PlayableDirector _director;
-			private IEnumerable<TimelineClip> _clips;
 			private CinematicCameraState _defaultState;
 			private CinematicCamera _trackBinding;
 			private bool _firstFrameHappened;

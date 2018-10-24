@@ -142,7 +142,7 @@ namespace Framework
 					if (previewCamera != null)
 					{
 						EditorGUILayout.Separator();
-						if (GUILayout.Button("Preview Shot", _preview ? EditorUtils.ToggleButtonToggledStyle : EditorUtils.ToggleButtonStyle))
+						if (GUILayout.Button("Preview Shot", _preview ? EditorUtils.ToggleButtonToggledStyle : EditorUtils.ToggleButtonStyle, GUILayout.ExpandWidth(false)))
 						{
 							if (!_preview)
 							{
