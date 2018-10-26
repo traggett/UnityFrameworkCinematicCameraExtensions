@@ -1,5 +1,5 @@
+using Framework.Utils;
 using Framework.Utils.Editor;
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -289,10 +289,24 @@ namespace Framework
 				{
 					foreach (Camera camera in Camera.allCameras)
 					{
+						CameraEvents cameraEvents = camera.GetComponent<CameraEvents>();
+
+						if (cameraEvents != null)
+						{
+							cameraEvents.OnPreCull();
+							cameraEvents.OnPreRender();
+						}
+
+
 						RenderTexture texture = camera.targetTexture;
 						camera.targetTexture = _targetTexture;
 						camera.Render();
 						camera.targetTexture = texture;
+
+						if (cameraEvents != null)
+						{
+							cameraEvents.OnPostRender();
+						}
 					}
 				}
 
