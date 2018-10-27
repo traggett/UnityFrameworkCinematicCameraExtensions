@@ -57,7 +57,7 @@ namespace Framework
 					float shotPosition = _currentShot._time / _currentShot._duration;
 					_camera.SetState(_currentShot.GetState());
 				}
-				else if (_blendingShots.Length > 0 || _currentShot._shot != null)
+				else if (_blendingShots != null && _blendingShots.Length > 0 || _currentShot._shot != null)
 				{
 					CinematicCameraState blendedState;
 
