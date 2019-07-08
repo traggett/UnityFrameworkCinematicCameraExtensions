@@ -21,7 +21,7 @@ namespace Framework
 			public float _duration = 0.0f;
 			public eExtrapolation _extrapolation = eExtrapolation.Hold;
 			public float _blendTime = 0.0f;
-			public eInterpolation _blendEaseType = eInterpolation.InOutSine;
+			public InterpolationType _blendEaseType = InterpolationType.InOutSine;
 			#endregion
 
 			#region Event

@@ -53,7 +53,7 @@ namespace Framework
 				return _focusPointDistance;
 			}
 
-			public static CinematicCameraFocusInfo Interpolate(CinematicCamera camera, eInterpolation ease, CinematicCameraFocusInfo from, CinematicCameraFocusInfo to, float t)
+			public static CinematicCameraFocusInfo Interpolate(CinematicCamera camera, InterpolationType ease, CinematicCameraFocusInfo from, CinematicCameraFocusInfo to, float t)
 			{
 				float focusDistance = MathUtils.Interpolate(ease, from.GetFocusDistance(camera), to.GetFocusDistance(camera), t);
 				float focusLength = MathUtils.Interpolate(ease, from._focusPointFocalLength, to._focusPointFocalLength, t);

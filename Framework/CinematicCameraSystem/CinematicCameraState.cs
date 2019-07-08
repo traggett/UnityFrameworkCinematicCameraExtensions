@@ -23,7 +23,7 @@ namespace Framework
 				_focusInfo = focusInfo;
 			}
 
-			public static CinematicCameraState Interpolate(CinematicCamera camera, CinematicCameraState from, CinematicCameraState to, eInterpolation ease, float t)
+			public static CinematicCameraState Interpolate(CinematicCamera camera, CinematicCameraState from, CinematicCameraState to, InterpolationType ease, float t)
 			{
 				return new CinematicCameraState(
 					MathUtils.Interpolate(ease, from._position, to._position, t),

@@ -23,7 +23,7 @@ namespace Framework
 			{
 				public CinematicCameraShot _shot;
 				public float _weight;
-				public eInterpolation _blendType;
+				public InterpolationType _blendType;
 				public float _time;
 				public float _duration;
 				public eExtrapolation _extrapolation;
@@ -89,7 +89,7 @@ namespace Framework
 			#endregion
 
 			#region Public Functions
-			public void StartCameraShot(CinematicCameraShot shot, float duration, eExtrapolation extrapolation, float blendTime = -1.0f, eInterpolation blendType = eInterpolation.Linear)
+			public void StartCameraShot(CinematicCameraShot shot, float duration, eExtrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
 			{
 				if (blendTime <= 0.0f)
 				{
@@ -110,7 +110,7 @@ namespace Framework
 				_currentShot._time = 0.0f;
 			}
 
-			public void StopCameraShot(CinematicCameraShot shot, float blendTime = -1.0f, eInterpolation blendType = eInterpolation.Linear)
+			public void StopCameraShot(CinematicCameraShot shot, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
 			{
 				if (_currentShot._shot != null && _currentShot._shot == shot)
 				{

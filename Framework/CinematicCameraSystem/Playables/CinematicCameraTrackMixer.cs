@@ -100,7 +100,7 @@ namespace Framework
 							}
 							else
 							{
-								blendedState = CinematicCameraState.Interpolate(_trackBinding, blendedState, states[i], eInterpolation.Linear, inputWeights[i] * weightAdjust);
+								blendedState = CinematicCameraState.Interpolate(_trackBinding, blendedState, states[i], InterpolationType.Linear, inputWeights[i] * weightAdjust);
 							}
 						}
 					}

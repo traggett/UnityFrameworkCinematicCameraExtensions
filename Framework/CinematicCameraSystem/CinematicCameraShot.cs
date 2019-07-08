@@ -39,7 +39,7 @@ namespace Framework
 				PanTo,
 			}
 			public eAutoPanStyle _autoPanStyle;
-			public eInterpolation _autoPanEase;
+			public InterpolationType _autoPanEase;
 
 			public Vector3 _autoPanTranslation;
 
