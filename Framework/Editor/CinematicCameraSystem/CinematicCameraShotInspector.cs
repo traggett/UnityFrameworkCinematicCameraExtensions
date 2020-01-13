@@ -220,16 +220,21 @@ namespace Framework
 						previewCamera.SetState(shot.GetState(clipPosition));
 
 						Rect sceneViewRect = Camera.current.pixelRect;
+
+						//IF double pixel rendering!!
+						sceneViewRect.width /= 2;
+						sceneViewRect.height /= 2;
+
 						int viewWidth = (int)sceneViewRect.width;
 						int viewHeight = (int)sceneViewRect.height;
 
 						//If at this height the width is to big, need to make height less
-						if (viewHeight * kAspectRatio > viewWidth)
+						if (Mathf.FloorToInt(viewHeight * kAspectRatio) > viewWidth)
 						{
 							viewHeight = (int)(sceneViewRect.width * (1f / kAspectRatio));
 						}
 						//If at this height the height is to big, need to make width less
-						if (viewWidth * (1f / kAspectRatio) > viewHeight)
+						if (Mathf.FloorToInt(viewWidth * (1f / kAspectRatio)) > viewHeight)
 						{
 							viewWidth = (int)(sceneViewRect.height * kAspectRatio);
 						}
@@ -269,7 +274,7 @@ namespace Framework
 							GUI.color = Color.black;
 							GUI.DrawTexture(sceneViewRect, EditorUtils.OnePixelTexture);
 							GUI.color = guiColor;
-
+							
 							//Render game texture to screen
 							Rect viewRect = new Rect
 							{
@@ -279,7 +284,7 @@ namespace Framework
 							viewRect.x = (sceneViewRect.width - viewRect.width) * 0.5f;
 							viewRect.y = (sceneViewRect.height - viewRect.height) * 0.5f;
 							GUI.DrawTexture(GetFlippedRect(viewRect), _targetTexture, ScaleMode.StretchToFill, false);
-
+							
 							GUI.EndGroup();
 						}
 					}
