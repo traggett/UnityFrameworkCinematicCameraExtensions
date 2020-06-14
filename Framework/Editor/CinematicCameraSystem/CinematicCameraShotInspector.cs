@@ -22,16 +22,6 @@ namespace Framework
 				private SerializedProperty _shotTypeProperty;
 				private SerializedProperty _shotModifiersProperty;
 
-				private SerializedProperty _autoPanFlagsProperty;
-				private SerializedProperty _autoPanStyleProperty;
-				private SerializedProperty _autoPanEaseProperty;
-				private SerializedProperty _autoPanTranslationProperty;
-				private SerializedProperty _autoRotateTypeProperty;
-				private SerializedProperty _autoRotateAngleProperty;
-				private SerializedProperty _autoRotateLocalPointProperty;
-				private SerializedProperty _autoZoomStyleProperty;
-				private SerializedProperty _autoZoomAmountProperty;
-
 				private SerializedProperty _previewCameraProperty;
 				private SerializedProperty _previewDurationProperty;
 				private SerializedProperty _previewClipExtrapolationProperty;
@@ -57,16 +47,6 @@ namespace Framework
 
 					_shotTypeProperty = serializedObject.FindProperty("_shotType");
 					_shotModifiersProperty = serializedObject.FindProperty("_cinematicCameraShotModifiers");
-
-					_autoPanFlagsProperty = serializedObject.FindProperty("_autoPanFlags");
-					_autoPanStyleProperty = serializedObject.FindProperty("_autoPanStyle");
-					_autoPanEaseProperty = serializedObject.FindProperty("_autoPanEase");
-					_autoPanTranslationProperty = serializedObject.FindProperty("_autoPanTranslation");
-					_autoRotateTypeProperty = serializedObject.FindProperty("_autoRotateType");
-					_autoRotateAngleProperty = serializedObject.FindProperty("_autoRotateAngle");
-					_autoRotateLocalPointProperty = serializedObject.FindProperty("_autoRotateLocalPoint");
-					_autoZoomStyleProperty = serializedObject.FindProperty("_autoZoomStyle");
-					_autoZoomAmountProperty = serializedObject.FindProperty("_autoZoomAmount");
 
 					_previewCameraProperty = serializedObject.FindProperty("_previewCamera");
 					_previewDurationProperty = serializedObject.FindProperty("_previewClipDuration");
@@ -97,18 +77,6 @@ namespace Framework
 					EditorGUILayout.Separator();
 					
 					EditorGUILayout.PropertyField(_shotTypeProperty);
-
-					CinematicCameraShot.eShotType shotType = (CinematicCameraShot.eShotType )_shotTypeProperty.enumValueIndex;
-
-					switch (shotType)
-					{
-						case CinematicCameraShot.eShotType.AutoPan:
-							DrawAutoPanProperties();
-							break;
-						case CinematicCameraShot.eShotType.Rail:
-							DrawRailCamProperties();
-							break;
-					}
 
 					EditorGUILayout.Separator();
 					EditorGUILayout.LabelField("<b>Modifiers</b>", EditorUtils.InspectorSubHeaderStyle);
@@ -421,56 +389,6 @@ namespace Framework
 				private static void OnSaveScene(Scene scene, string path)
 				{
 					StopPreviewing();
-				}
-
-				private void DrawAutoPanProperties()
-				{
-					EditorGUILayout.PropertyField(_autoPanStyleProperty);
-					EditorGUILayout.PropertyField(_autoPanEaseProperty);
-
-					CinematicCameraShot.eAutoPanFlags autoPanFlags = (CinematicCameraShot.eAutoPanFlags)EditorGUILayout.EnumFlagsField("Auto Pan Flags", (CinematicCameraShot.eAutoPanFlags)_autoPanFlagsProperty.intValue);
-					_autoPanFlagsProperty.intValue = (int)autoPanFlags;
-
-					if ((autoPanFlags & CinematicCameraShot.eAutoPanFlags.Translate) == CinematicCameraShot.eAutoPanFlags.Translate)
-					{
-						EditorGUILayout.LabelField("Translation", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(_autoPanTranslationProperty);
-					}
-
-					if ((autoPanFlags & CinematicCameraShot.eAutoPanFlags.Rotate) == CinematicCameraShot.eAutoPanFlags.Rotate)
-					{
-						EditorGUILayout.LabelField("Rotation", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(_autoRotateTypeProperty);
-						EditorGUILayout.PropertyField(_autoRotateAngleProperty);
-
-						CinematicCameraShot.eAutoRotateType rotateType = (CinematicCameraShot.eAutoRotateType)_autoRotateTypeProperty.enumValueIndex;
-
-						switch (rotateType)
-						{
-							case CinematicCameraShot.eAutoRotateType.RotateAroundLocalPoint:
-								{
-									EditorGUILayout.PropertyField(_autoRotateLocalPointProperty, new GUIContent("Auto Rotate Local Pivot"));
-								}
-								break;
-							case CinematicCameraShot.eAutoRotateType.RotateAroundAxis:
-								{
-									EditorUtils.AxisPropertyField(_autoRotateLocalPointProperty, new GUIContent("Auto Rotate Axis"));
-								}
-								break;
-						}
-					}
-
-					if ((autoPanFlags & CinematicCameraShot.eAutoPanFlags.Zoom) == CinematicCameraShot.eAutoPanFlags.Zoom)
-					{
-						EditorGUILayout.LabelField("Zoom", EditorStyles.boldLabel);
-						EditorGUILayout.PropertyField(_autoZoomStyleProperty);
-						EditorGUILayout.PropertyField(_autoZoomAmountProperty);
-					}
-				}
-
-				private void DrawRailCamProperties()
-				{
-
 				}
 			}
 		}

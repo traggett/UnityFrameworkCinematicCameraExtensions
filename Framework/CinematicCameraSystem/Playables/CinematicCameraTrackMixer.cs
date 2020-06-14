@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Framework
 {
 	using Maths;
+	using UnityEngine;
 
 	namespace CinematicCameraSystem
 	{

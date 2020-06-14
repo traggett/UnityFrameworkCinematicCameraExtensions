@@ -12,7 +12,7 @@ namespace Framework
 			#endregion
 
 			#region Public Functions
-			public override void ModifiyState(ref CinematicCameraState state)
+			public override void ModifiyState(ref CinematicCameraState state, float clipPosition)
 			{
 				state._rotation *= _rotation;
 				state._position += state._rotation * _translation;

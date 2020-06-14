@@ -7,7 +7,7 @@ namespace Framework
 		public abstract class CinematicCameraShotModifier : MonoBehaviour
 		{
 			#region Public Functions
-			public abstract void ModifiyState(ref CinematicCameraState state);
+			public abstract void ModifiyState(ref CinematicCameraState state, float clipPosition);
 			#endregion
 		}
 	}
