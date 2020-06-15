@@ -1,13 +1,12 @@
-using UnityEngine;
-
-using Framework.Utils;
 using Framework.Maths;
+using Framework.Utils;
+using UnityEngine;
 
 namespace Framework
 {
 	namespace CinematicCameraSystem
 	{
-		public enum eExtrapolation
+		public enum Extrapolation
 		{
 			Loop,
 			PingPong,
@@ -26,7 +25,7 @@ namespace Framework
 				public InterpolationType _blendType;
 				public float _time;
 				public float _duration;
-				public eExtrapolation _extrapolation;
+				public Extrapolation _extrapolation;
 				
 				public CinematicCameraState GetState()
 				{
@@ -89,7 +88,7 @@ namespace Framework
 			#endregion
 
 			#region Public Functions
-			public void StartCameraShot(CinematicCameraShot shot, float duration, eExtrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
+			public void StartCameraShot(CinematicCameraShot shot, float duration, Extrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
 			{
 				if (blendTime <= 0.0f)
 				{
@@ -131,22 +130,23 @@ namespace Framework
 				}
 			}
 
-			public static float GetClipPosition(eExtrapolation extrapolation, float time, float duration)
+			public static float GetClipPosition(Extrapolation extrapolation, float time, float duration)
 			{
 				if (Mathf.Approximately(duration, 0.0f))
 					return 0.0f;
 
-				float t = Mathf.Abs(time) / duration;
+				float t = time / duration;
 
 				switch (extrapolation)
 				{
-					case eExtrapolation.Loop:
+					case Extrapolation.Loop:
 						{
-							return t - Mathf.Floor(t);
+							return Mathf.Abs(t) - Mathf.Floor(t);
 						}
 						
-					case eExtrapolation.PingPong:
+					case Extrapolation.PingPong:
 						{
+							t = Mathf.Abs(t);
 							int n = Mathf.FloorToInt(t);
 							t -= (float)n;
 
@@ -155,7 +155,7 @@ namespace Framework
 
 							return t;
 						}
-					case eExtrapolation.Hold:
+					case Extrapolation.Hold:
 					default:
 						return Mathf.Clamp01(t);
 				}

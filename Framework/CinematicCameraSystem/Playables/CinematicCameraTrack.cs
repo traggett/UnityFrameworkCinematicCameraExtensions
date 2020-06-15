@@ -9,6 +9,7 @@ namespace Framework
 	{
 		[TrackColor(0.99f, 0.4f, 0.71372549019f)]
 		[TrackClipType(typeof(CinematicCameraShotClip))]
+		[TrackClipType(typeof(CinematicCameraPathClip))]
 		[TrackBindingType(typeof(CinematicCamera))]
 		public class CinematicCameraTrack : TrackAsset
 		{

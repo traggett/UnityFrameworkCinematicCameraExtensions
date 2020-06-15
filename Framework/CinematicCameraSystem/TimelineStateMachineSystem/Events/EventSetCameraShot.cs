@@ -19,7 +19,7 @@ namespace Framework
 			public ComponentRef<CinematicCameraMixer> _camera;
 			public ComponentRef<CinematicCameraShot> _shot;
 			public float _duration = 0.0f;
-			public eExtrapolation _extrapolation = eExtrapolation.Hold;
+			public Extrapolation _extrapolation = Extrapolation.Hold;
 			public float _blendTime = 0.0f;
 			public InterpolationType _blendEaseType = InterpolationType.InOutSine;
 			#endregion

@@ -34,7 +34,7 @@ namespace Framework
 			[HideInInspector]
 			public float _previewClipDuration;
 			[HideInInspector]
-			public eExtrapolation _previewClipExtrapolation;
+			public Extrapolation _previewClipExtrapolation;
 #endif
 			#endregion
 

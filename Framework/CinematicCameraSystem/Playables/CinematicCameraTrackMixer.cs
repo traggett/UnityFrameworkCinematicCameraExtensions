@@ -1,10 +1,12 @@
+using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Framework
 {
+	using Framework.Paths;
 	using Maths;
-	using UnityEngine;
+
 
 	namespace CinematicCameraSystem
 	{
@@ -45,7 +47,7 @@ namespace Framework
 					ScriptPlayable<CinematicCameraPlayableBehaviour> scriptPlayable = (ScriptPlayable<CinematicCameraPlayableBehaviour>)playable.GetInput(i);
 					CinematicCameraPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
 
-					if (inputBehaviour != null && inputBehaviour._cameraShot != null)
+					if (inputBehaviour != null && (inputBehaviour._cameraShot != null || inputBehaviour._path != null))
 					{
 						float inputWeight = playable.GetInputWeight(i);
 
@@ -62,7 +64,7 @@ namespace Framework
 								{
 									inputWeights[i] = inputWeight;
 
-									eExtrapolation extrapolation = eExtrapolation.Hold;
+									Extrapolation extrapolation = Extrapolation.Hold;
 
 									if (clip.hasPreExtrapolation && _director.time < clip.start)
 										extrapolation = GetExtrapolation(clip.preExtrapolationMode);
@@ -71,9 +73,63 @@ namespace Framework
 
 									float clipPosition = CinematicCameraMixer.GetClipPosition(extrapolation, (float)(_director.time - clip.start), (float)clip.duration);
 
-									states[i] = inputBehaviour._cameraShot.GetState(clipPosition);
+									//Single shot
+									if (inputBehaviour._cameraShot != null)
+									{
+										states[i] = inputBehaviour._cameraShot.GetState(clipPosition);
+									}
+									//Camera path
+									else if (inputBehaviour._path != null)
+									{
+										float pathT = (float)clipPosition;
+
+										//Work out path position
+										PathPosition pos = inputBehaviour._path.GetPoint(pathT);
+
+										//Work out a lerp between to path nodes
+										inputBehaviour._path.GetNodeSection(pathT, out int startNode, out int endNode, out float sectionT);
+
+										//Lerp camera shot state based on the relevant section of the path
+										GetPathNodeStateInfo(inputBehaviour._path, startNode, out CinematicCameraState startNodeState, out Quaternion startNodeFromTo, out Vector3 startNodeCamFor, out Vector3 startNodeCamUp);
+										GetPathNodeStateInfo(inputBehaviour._path, endNode, out CinematicCameraState endNodeState, out Quaternion endNodeFromTo, out Vector3 endNodeCamFor, out Vector3 endNodeCamUp);
+
+										Vector3 cameraForward;
+										Vector3 cameraUp;
+
+										if (sectionT <= 0f)
+										{
+											states[i] = startNodeState;
+											//cameraForward = startNodeFromTo * pos._pathForward;
+											cameraForward = startNodeCamFor;
+											cameraUp = startNodeCamUp;
+										}
+										else if (sectionT >= 1f)
+										{
+											states[i] = endNodeState;
+											//cameraForward = endNodeFromTo * pos._pathForward;
+											cameraForward = endNodeCamFor;
+											cameraUp = endNodeCamUp;
+										}
+										else
+										{
+											states[i] = CinematicCameraState.Interpolate(_trackBinding, startNodeState, endNodeState, InterpolationType.Linear, sectionT);
+
+											//Work out rotation based on 
+											Quaternion cameraRotation = Quaternion.Slerp(startNodeFromTo, endNodeFromTo, sectionT);
+											cameraForward = cameraRotation * pos._pathForward;
+
+											cameraForward = Vector3.Lerp(startNodeCamFor, endNodeCamFor, sectionT);
+											cameraUp = Vector3.Lerp(startNodeCamUp, endNodeCamUp, sectionT);
+										}
+											
+
+										//Set camera position from path pos
+										states[i]._position = pos._pathPosition;
+										states[i]._rotation = Quaternion.LookRotation(cameraForward, cameraUp);
 
 
+									}
+									
 									totalWeights += inputWeights[i];
 								}
 							}
@@ -120,22 +176,44 @@ namespace Framework
 				_firstFrameHappened = false;
 			}
 
-			private static eExtrapolation GetExtrapolation(TimelineClip.ClipExtrapolation clipExtrapolation)
+			private static Extrapolation GetExtrapolation(TimelineClip.ClipExtrapolation clipExtrapolation)
 			{
 				switch (clipExtrapolation)
 				{
 					case TimelineClip.ClipExtrapolation.Loop:
-						return eExtrapolation.Loop;
+						return Extrapolation.Loop;
 					case TimelineClip.ClipExtrapolation.PingPong:
-						return eExtrapolation.PingPong;
+						return Extrapolation.PingPong;
 					case TimelineClip.ClipExtrapolation.None:
 					case TimelineClip.ClipExtrapolation.Continue:
 					case TimelineClip.ClipExtrapolation.Hold:
 					default:
-						return eExtrapolation.Hold;
+						return Extrapolation.Hold;
 				}
 			}
 
+			private void GetPathNodeStateInfo(Path path, int nodeIndex, out CinematicCameraState cameraState, out Quaternion rotationToPath, out Vector3 forwardDir, out Vector3 upDir)
+			{
+				// (TO DO: cache components)
+				CinematicCameraShot shot = path._nodes[nodeIndex]._node.GetComponent<CinematicCameraShot>();
+
+				if (shot != null)
+				{
+					cameraState = shot.GetState();
+
+					PathPosition nodePos = path.GetPoint(path.GetPathT(path._nodes[nodeIndex]._node));
+					rotationToPath = Quaternion.FromToRotation(nodePos._pathForward, shot.transform.forward);
+					forwardDir = shot.transform.forward;
+					upDir = shot.transform.up;
+				}
+				else
+				{
+					cameraState = default;
+					rotationToPath = Quaternion.identity;
+					forwardDir = Vector3.forward;
+					upDir = Vector3.up;
+				}
+			}
 		}
 	}
 }
