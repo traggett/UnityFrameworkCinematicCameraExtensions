@@ -6,7 +6,7 @@ namespace Framework
 {
 	using Framework.Paths;
 	using Maths;
-
+	using System;
 
 	namespace CinematicCameraSystem
 	{
@@ -81,7 +81,7 @@ namespace Framework
 									//Camera path
 									else if (inputBehaviour._path != null)
 									{
-										float pathT = (float)clipPosition;
+										float pathT = (float)MathUtils.Interpolate(inputBehaviour._pathInterpolation, 0d, 1f, clipPosition);
 
 										//Work out path position
 										PathPosition pos = inputBehaviour._path.GetPoint(pathT);

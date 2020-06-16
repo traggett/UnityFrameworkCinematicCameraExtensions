@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 
 namespace Framework
 {
+	using Maths;
 	using Paths;
 
 	namespace CinematicCameraSystem
@@ -12,6 +13,7 @@ namespace Framework
 			public Object _clipAsset;
 			public CinematicCameraShot _cameraShot;
 			public Path _path;
+			public InterpolationType _pathInterpolation;
 		}
 	}
 }

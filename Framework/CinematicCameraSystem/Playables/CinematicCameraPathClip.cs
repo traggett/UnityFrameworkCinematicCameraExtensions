@@ -6,6 +6,7 @@ using UnityEngine.Timeline;
 
 namespace Framework
 {
+	using Framework.Maths;
 	using Paths;
 
 	namespace CinematicCameraSystem
@@ -14,7 +15,8 @@ namespace Framework
 		public class CinematicCameraPathClip : PlayableAsset, ITimelineClipAsset
 		{
 			public ExposedReference<Path> _path;
-			
+			public InterpolationType _interpolation = InterpolationType.Linear;
+
 			public ClipCaps clipCaps
 			{
 				get { return ClipCaps.Blending | ClipCaps.Extrapolation | ClipCaps.Looping; }
@@ -26,6 +28,7 @@ namespace Framework
 				CinematicCameraPlayableBehaviour clone = playable.GetBehaviour();
 				clone._clipAsset = this;
 				clone._path = _path.Resolve(graph.GetResolver());
+				clone._pathInterpolation = _interpolation;
 				return playable;
 			}
 		}
