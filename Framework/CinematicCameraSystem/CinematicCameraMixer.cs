@@ -130,6 +130,27 @@ namespace Framework
 				}
 			}
 
+			public void StopAll(float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
+			{
+				if (_currentShot._shot != null)
+				{
+					if (blendTime <= 0.0f)
+					{
+						_currentShot._weight = 1.0f;
+						_blendingShots = new ShotInfo[0];
+					}
+					else
+					{
+						ArrayUtils.Add(ref _blendingShots, _currentShot);
+						_currentShot._weight = 0.0f;
+						_currentShot._blendType = blendType;
+						_currentShotBlendSpeed = 1.0f / blendTime;
+					}
+
+					_currentShot = new ShotInfo();
+				}
+			}
+
 			public static float GetClipPosition(Extrapolation extrapolation, float time, float duration)
 			{
 				if (Mathf.Approximately(duration, 0.0f))
