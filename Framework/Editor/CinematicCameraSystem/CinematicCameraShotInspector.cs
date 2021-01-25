@@ -23,6 +23,7 @@ namespace Framework
 				private SerializedProperty _shotModifiersProperty;
 
 				private SerializedProperty _previewCameraProperty;
+				private SerializedProperty _previewUsingAllCamerasProperty;
 				private SerializedProperty _previewDurationProperty;
 				private SerializedProperty _previewClipExtrapolationProperty;
 
@@ -30,7 +31,6 @@ namespace Framework
 				private static readonly float kMovementSpeed = 0.075f;
 				private static readonly float kFastMovementSpeed = 0.16f;
 				private static readonly bool[] _mouseDown = new bool[3];
-				private static float kAspectRatio = 16f / 9f;
 				private static CinematicCameraState _originalCameraState;
 				private static bool _preview;
 				private static CinematicCameraShotInspector _previewShot;
@@ -49,6 +49,7 @@ namespace Framework
 					_shotModifiersProperty = serializedObject.FindProperty("_cinematicCameraShotModifiers");
 
 					_previewCameraProperty = serializedObject.FindProperty("_previewCamera");
+					_previewUsingAllCamerasProperty = serializedObject.FindProperty("_previewUsingAllCameras");
 					_previewDurationProperty = serializedObject.FindProperty("_previewClipDuration");
 					_previewClipExtrapolationProperty = serializedObject.FindProperty("_previewClipExtrapolation");
 				}
@@ -159,6 +160,10 @@ namespace Framework
 						_preview = true;
 						_previewShot = inspector;
 						_previewClipTime = 0.0f;
+
+						//Force refresh the scene view
+						EditorWindow view = EditorWindow.GetWindow<SceneView>();
+   						view.Repaint();
 					}
 				}
 
@@ -173,6 +178,10 @@ namespace Framework
 
 						_preview = false;
 						_previewShot = null;
+
+						//Force refresh the scene view
+						EditorWindow view = EditorWindow.GetWindow<SceneView>();
+   						view.Repaint();
 					}
 				}
 
@@ -184,27 +193,28 @@ namespace Framework
 					{
 						CinematicCameraShot shot = (CinematicCameraShot)target;
 
+
+						Vector2 gameViewRes = GetMainGameViewSize();
+						float aspectRatio = gameViewRes.x / gameViewRes.y;
+
+
 						float clipPosition = CinematicCameraMixer.GetClipPosition(shot._previewClipExtrapolation, _previewClipTime, shot._previewClipDuration);
 						previewCamera.SetState(shot.GetState(clipPosition));
 
 						Rect sceneViewRect = Camera.current.pixelRect;
 
-						//IF double pixel rendering!!
-						sceneViewRect.width /= 2;
-						sceneViewRect.height /= 2;
-
 						int viewWidth = (int)sceneViewRect.width;
 						int viewHeight = (int)sceneViewRect.height;
 
 						//If at this height the width is to big, need to make height less
-						if (Mathf.FloorToInt(viewHeight * kAspectRatio) > viewWidth)
+						if (Mathf.FloorToInt(viewHeight * aspectRatio) > viewWidth)
 						{
-							viewHeight = (int)(sceneViewRect.width * (1f / kAspectRatio));
+							viewHeight = (int)(sceneViewRect.width * (1f / aspectRatio));
 						}
 						//If at this height the height is to big, need to make width less
-						if (Mathf.FloorToInt(viewWidth * (1f / kAspectRatio)) > viewHeight)
+						if (Mathf.FloorToInt(viewWidth * (1f / aspectRatio)) > viewHeight)
 						{
-							viewWidth = (int)(sceneViewRect.height * kAspectRatio);
+							viewWidth = (int)(sceneViewRect.height * aspectRatio);
 						}
 
 						if (_targetTexture == null || viewWidth != _targetTexture.width || viewHeight != _targetTexture.height)
@@ -260,26 +270,38 @@ namespace Framework
 
 				private void RenderCameras()
 				{
-					foreach (Camera camera in Camera.allCameras)
+					if (_previewUsingAllCamerasProperty.boolValue)
 					{
-						CameraEvents cameraEvents = camera.GetComponent<CameraEvents>();
-
-						if (cameraEvents != null)
+						foreach (Camera camera in Camera.allCameras)
 						{
-							cameraEvents.OnPreCull();
-							cameraEvents.OnPreRender();
+							RenderCamera(camera);
 						}
+					}
+					else
+					{
+						CinematicCamera previewCamera = (CinematicCamera)_previewCameraProperty.objectReferenceValue;
+						RenderCamera(previewCamera.GetCamera());
+					}				
+				}
 
+				private void RenderCamera(Camera camera)
+				{
+					CameraEvents cameraEvents = camera.GetComponent<CameraEvents>();
 
-						RenderTexture texture = camera.targetTexture;
-						camera.targetTexture = _targetTexture;
-						camera.Render();
-						camera.targetTexture = texture;
+					if (cameraEvents != null)
+					{
+						cameraEvents.OnPreCull();
+						cameraEvents.OnPreRender();
+					}
 
-						if (cameraEvents != null)
-						{
-							cameraEvents.OnPostRender();
-						}
+					RenderTexture texture = camera.targetTexture;
+					camera.targetTexture = _targetTexture;
+					camera.Render();
+					camera.targetTexture = texture;
+
+					if (cameraEvents != null)
+					{
+						cameraEvents.OnPostRender();
 					}
 				}
 
@@ -389,6 +411,14 @@ namespace Framework
 				private static void OnSaveScene(Scene scene, string path)
 				{
 					StopPreviewing();
+				}
+
+				public static Vector2 GetMainGameViewSize()
+				{
+					System.Type T = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+					System.Reflection.MethodInfo GetSizeOfMainGameView = T.GetMethod("GetSizeOfMainGameView",System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+					System.Object Res = GetSizeOfMainGameView.Invoke(null,null);
+					return (Vector2)Res;
 				}
 			}
 		}

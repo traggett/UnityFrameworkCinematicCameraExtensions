@@ -32,6 +32,8 @@ namespace Framework
 			[HideInInspector]
 			public CinematicCamera _previewCamera;
 			[HideInInspector]
+			public bool _previewUsingAllCameras;
+			[HideInInspector]
 			public float _previewClipDuration;
 			[HideInInspector]
 			public Extrapolation _previewClipExtrapolation;
