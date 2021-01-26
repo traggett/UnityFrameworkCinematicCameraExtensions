@@ -45,7 +45,6 @@ namespace Framework
 					_cameraRectProperty = serializedObject.FindProperty("_cameraRect");
 					_focusInfoProperty = serializedObject.FindProperty("_focusInfo");
 
-					_shotTypeProperty = serializedObject.FindProperty("_shotType");
 					_shotModifiersProperty = serializedObject.FindProperty("_cinematicCameraShotModifiers");
 
 					_previewCameraProperty = serializedObject.FindProperty("_previewCamera");
@@ -72,12 +71,6 @@ namespace Framework
 					EditorGUILayout.PropertyField(_fieldOfViewProperty);
 					EditorGUILayout.PropertyField(_cameraRectProperty);
 					EditorGUILayout.PropertyField(_focusInfoProperty);
-
-					EditorGUILayout.Separator();
-					EditorGUILayout.LabelField("<b>Shot Properties</b>", EditorUtils.InspectorSubHeaderStyle);
-					EditorGUILayout.Separator();
-					
-					EditorGUILayout.PropertyField(_shotTypeProperty);
 
 					EditorGUILayout.Separator();
 					EditorGUILayout.LabelField("<b>Modifiers</b>", EditorUtils.InspectorSubHeaderStyle);
@@ -161,9 +154,7 @@ namespace Framework
 						_previewShot = inspector;
 						_previewClipTime = 0.0f;
 
-						//Force refresh the scene view
-						EditorWindow view = EditorWindow.GetWindow<SceneView>();
-   						view.Repaint();
+						 RefreshSceneView();
 					}
 				}
 
@@ -264,6 +255,8 @@ namespace Framework
 							GUI.DrawTexture(GetFlippedRect(viewRect), _targetTexture, ScaleMode.StretchToFill, false);
 							
 							GUI.EndGroup();
+
+							RefreshSceneView();
 						}
 					}
 				}
@@ -419,6 +412,13 @@ namespace Framework
 					System.Reflection.MethodInfo GetSizeOfMainGameView = T.GetMethod("GetSizeOfMainGameView",System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 					System.Object Res = GetSizeOfMainGameView.Invoke(null,null);
 					return (Vector2)Res;
+				}
+
+				private static void RefreshSceneView()
+				{
+					//Force refresh the scene view
+					EditorWindow view = EditorWindow.GetWindow<SceneView>();
+   					view.Repaint();
 				}
 			}
 		}

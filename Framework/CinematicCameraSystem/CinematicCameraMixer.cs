@@ -60,7 +60,7 @@ namespace Framework
 				{
 					CinematicCameraState blendedState;
 
-					if (_blendingShots.Length > 0)
+					if (_blendingShots != null && _blendingShots.Length > 0)
 					{
 						_blendingShots[0]._time += Time.deltaTime;
 
@@ -95,7 +95,7 @@ namespace Framework
 					_currentShot._weight = 1.0f;
 					_blendingShots = new ShotInfo[0];
 				}
-				else
+				else if (_currentShot._shot != null)
 				{
 					ArrayUtils.Add(ref _blendingShots, _currentShot);
 					_currentShot._weight = 0.0f;

@@ -15,18 +15,6 @@ namespace Framework
 			public CinematicCameraFocusInfo _focusInfo = CinematicCameraFocusInfo.kDefault;
 			public CinematicCameraShotModifier[] _cinematicCameraShotModifiers;
 
-			public enum eShotType
-			{
-				Static,
-				AutoPan,
-				Rail,
-			}
-			public eShotType _shotType;
-
-			#region Auto Pan
-			
-			#endregion
-
 			#region Previewing
 #if UNITY_EDITOR
 			[HideInInspector]
