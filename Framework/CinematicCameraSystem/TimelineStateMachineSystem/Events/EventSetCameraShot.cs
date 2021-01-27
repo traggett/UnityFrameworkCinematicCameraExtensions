@@ -18,18 +18,12 @@ namespace Framework
 			#region Public Data
 			public ComponentRef<CinematicCameraMixer> _camera;
 			public ComponentRef<CinematicCameraShot> _shot;
-			public float _duration = 0.0f;
 			public Extrapolation _extrapolation = Extrapolation.Hold;
 			public float _blendTime = 0.0f;
 			public InterpolationType _blendEaseType = InterpolationType.InOutSine;
 			#endregion
 
 			#region Event
-			public override float GetDuration()
-			{
-				return Mathf.Max(_blendTime, _duration);
-			}
-
 #if UNITY_EDITOR
 			public override Color GetEditorColor()
 			{
@@ -51,7 +45,7 @@ namespace Framework
 
 				if (camera != null && cameraShot != null)
 				{
-					camera.StartCameraShot(cameraShot, _duration, _extrapolation, _blendTime, _blendEaseType);
+					camera.StartCameraShot(cameraShot, _extrapolation, _blendTime, _blendEaseType);
 				}
 
 				return eEventTriggerReturn.EventOngoing;

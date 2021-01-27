@@ -24,12 +24,11 @@ namespace Framework
 				public float _weight;
 				public InterpolationType _blendType;
 				public float _time;
-				public float _duration;
 				public Extrapolation _extrapolation;
 				
 				public CinematicCameraState GetState()
 				{
-					return _shot.GetState(GetClipPosition(_extrapolation, _time, _duration));
+					return _shot.GetState(_time);
 				}
 			}
 			private ShotInfo _currentShot;
@@ -53,7 +52,6 @@ namespace Framework
 
 				if (_currentShot._shot != null && _currentShot._weight >= 1.0f)
 				{
-					float shotPosition = _currentShot._time / _currentShot._duration;
 					_camera.SetState(_currentShot.GetState());
 				}
 				else if (_blendingShots != null && _blendingShots.Length > 0 || _currentShot._shot != null)
@@ -88,7 +86,7 @@ namespace Framework
 			#endregion
 
 			#region Public Functions
-			public void StartCameraShot(CinematicCameraShot shot, float duration, Extrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
+			public void StartCameraShot(CinematicCameraShot shot, Extrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
 			{
 				if (blendTime <= 0.0f)
 				{
@@ -104,12 +102,11 @@ namespace Framework
 				}
 
 				_currentShot._shot = shot;
-				_currentShot._duration = duration;
 				_currentShot._extrapolation = extrapolation;
 				_currentShot._time = 0.0f;
 			}
 
-			public void StopCameraShot(CinematicCameraShot shot, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
+			public void StopCameraShot(CinematicCameraShot shot, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
 			{
 				if (_currentShot._shot != null && _currentShot._shot == shot)
 				{
@@ -130,7 +127,7 @@ namespace Framework
 				}
 			}
 
-			public void StopAll(float blendTime = -1.0f, InterpolationType blendType = InterpolationType.Linear)
+			public void StopAll(float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
 			{
 				if (_currentShot._shot != null)
 				{

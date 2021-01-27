@@ -18,13 +18,14 @@ namespace Framework
 				Zoom = 4,
 			}
 			public AutoPanFlags _autoPanFlags;
+			public float _panDuration;
 
-			public enum eAutoPanStyle
+			public enum AutoPanStyle
 			{
 				PanThrough,
 				PanTo,
 			}
-			public eAutoPanStyle _autoPanStyle;
+			public AutoPanStyle _autoPanStyle;
 			public InterpolationType _autoPanEase;
 
 			public Vector3 _autoPanTranslation;
@@ -46,12 +47,30 @@ namespace Framework
 			}
 			public AutoZoomStyle _autoZoomStyle;
 			public float _autoZoomAmount;
+
+			#region Previewing
+#if UNITY_EDITOR
+			[HideInInspector]
+			public float _previewClipPos;
+#endif
+			#endregion
+			
 			#endregion
 
 			#region Public Functions
-			public override void ModifiyState(ref CinematicCameraState state, float clipPosition)
+			public override void ModifiyState(ref CinematicCameraState state, float shotTime, float shotDuration)
 			{
-				ApplyAutoPan(ref state, clipPosition);
+				float panDuration = shotDuration > 0f ? shotDuration : _panDuration;
+				float clipPosition = panDuration > 0f ? shotTime / panDuration : 1f;
+
+#if UNITY_EDITOR
+				if (IsBeingPreviewed())
+				{
+					clipPosition = _previewClipPos;
+				}
+#endif
+
+				ApplyAutoPan(ref state, Mathf.Clamp01(clipPosition));
 			}
 			#endregion
 
@@ -76,7 +95,7 @@ namespace Framework
 
 			private void ApplyAutoPanZoom(ref CinematicCameraState state, float clipPosition)
 			{
-				float fieldOfView = state._fieldOfView + MathUtils.Interpolate(_autoPanEase, _autoZoomAmount, _autoPanStyle == eAutoPanStyle.PanThrough ? -_autoZoomAmount : 0.0f, clipPosition);
+				float fieldOfView = state._fieldOfView + MathUtils.Interpolate(_autoPanEase, _autoZoomAmount, _autoPanStyle == AutoPanStyle.PanThrough ? -_autoZoomAmount : 0.0f, clipPosition);
 
 				switch (_autoZoomStyle)
 				{
@@ -113,15 +132,13 @@ namespace Framework
 
 			private void ApplyAutoPanTranslation(ref CinematicCameraState state, float clipPosition)
 			{
-				Vector3 worldSpaceTranslate = this.transform.TransformPoint(_autoPanTranslation);
-				Vector3 movement = worldSpaceTranslate - this.transform.position;
-
-				state._position += MathUtils.Interpolate(_autoPanEase, movement, _autoPanStyle == eAutoPanStyle.PanThrough ? -movement : Vector3.zero, clipPosition);
+				Vector3 worldSpaceTranslate = this.transform.TransformDirection(_autoPanTranslation);
+				state._position += MathUtils.Interpolate(_autoPanEase, worldSpaceTranslate, _autoPanStyle == AutoPanStyle.PanThrough ? -worldSpaceTranslate : Vector3.zero, clipPosition);
 			}
 
 			private void ApplyAutoPanRotation(ref CinematicCameraState state, float clipPosition)
 			{
-				float angle = MathUtils.Interpolate(_autoPanEase, _autoRotateAngle, _autoPanStyle == eAutoPanStyle.PanThrough ? -_autoRotateAngle : 0.0f, clipPosition);
+				float angle = MathUtils.Interpolate(_autoPanEase, _autoRotateAngle, _autoPanStyle == AutoPanStyle.PanThrough ? -_autoRotateAngle : 0.0f, clipPosition);
 
 				switch (_autoRotateType)
 				{

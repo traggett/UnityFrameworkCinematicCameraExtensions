@@ -14,7 +14,6 @@ namespace Framework
 			#region Public Data
 			public ComponentRef<CinematicCameraMixer> _camera;
 			public ComponentRef<CinematicCameraShot> _shot;
-			public float _duration = 0.0f;
 			public Extrapolation _extrapolation = Extrapolation.Hold;
 			public float _blendTime = 0.0f;
 			public InterpolationType _blendEaseType = InterpolationType.InOutSine;
@@ -37,7 +36,7 @@ namespace Framework
 
 				if (camera != null && cameraShot != null)
 				{
-					camera.StartCameraShot(cameraShot, _duration, _extrapolation, _blendTime, _blendEaseType);
+					camera.StartCameraShot(cameraShot, _extrapolation, _blendTime, _blendEaseType);
 				}
 			}
 

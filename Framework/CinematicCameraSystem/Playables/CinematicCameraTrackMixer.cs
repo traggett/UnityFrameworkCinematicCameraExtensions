@@ -4,9 +4,8 @@ using UnityEngine.Timeline;
 
 namespace Framework
 {
-	using Framework.Paths;
+	using Paths;
 	using Maths;
-	using System;
 
 	namespace CinematicCameraSystem
 	{
@@ -71,16 +70,17 @@ namespace Framework
 									else if (clip.hasPostExtrapolation && _director.time > clip.start + clip.duration)
 										extrapolation = GetExtrapolation(clip.postExtrapolationMode);
 
-									float clipPosition = CinematicCameraMixer.GetClipPosition(extrapolation, (float)(_director.time - clip.start), (float)clip.duration);
+									float timeInClip = (float)(_director.time - clip.start);	
 
 									//Single shot
 									if (inputBehaviour._cameraShot != null)
 									{
-										states[i] = inputBehaviour._cameraShot.GetState(clipPosition);
+										states[i] = inputBehaviour._cameraShot.GetState(timeInClip, (float)clip.duration);
 									}
 									//Camera path
 									else if (inputBehaviour._path != null)
 									{
+										float clipPosition = CinematicCameraMixer.GetClipPosition(extrapolation, timeInClip, (float)clip.duration);
 										float pathT = (float)MathUtils.Interpolate(inputBehaviour._pathInterpolation, 0d, 1f, clipPosition);
 
 										//Work out path position
@@ -90,8 +90,8 @@ namespace Framework
 										inputBehaviour._path.GetNodeSection(pathT, out int startNode, out int endNode, out float sectionT);
 
 										//Lerp camera shot state based on the relevant section of the path
-										GetPathNodeStateInfo(inputBehaviour._path, startNode, out CinematicCameraState startNodeState, out Quaternion startNodeFromTo, out Vector3 startNodeCamFor, out Vector3 startNodeCamUp);
-										GetPathNodeStateInfo(inputBehaviour._path, endNode, out CinematicCameraState endNodeState, out Quaternion endNodeFromTo, out Vector3 endNodeCamFor, out Vector3 endNodeCamUp);
+										GetPathNodeStateInfo(timeInClip, (float)clip.duration, inputBehaviour._path, startNode, out CinematicCameraState startNodeState, out Quaternion startNodeFromTo, out Vector3 startNodeCamFor, out Vector3 startNodeCamUp);
+										GetPathNodeStateInfo(timeInClip, (float)clip.duration, inputBehaviour._path, endNode, out CinematicCameraState endNodeState, out Quaternion endNodeFromTo, out Vector3 endNodeCamFor, out Vector3 endNodeCamUp);
 
 										Vector3 cameraForward;
 										Vector3 cameraUp;
@@ -192,14 +192,14 @@ namespace Framework
 				}
 			}
 
-			private void GetPathNodeStateInfo(Path path, int nodeIndex, out CinematicCameraState cameraState, out Quaternion rotationToPath, out Vector3 forwardDir, out Vector3 upDir)
+			private void GetPathNodeStateInfo(float timeInClip, float clipDuration, Path path, int nodeIndex, out CinematicCameraState cameraState, out Quaternion rotationToPath, out Vector3 forwardDir, out Vector3 upDir)
 			{
 				// (TO DO: cache components)
 				CinematicCameraShot shot = path._nodes[nodeIndex]._node.GetComponent<CinematicCameraShot>();
 
 				if (shot != null)
 				{
-					cameraState = shot.GetState();
+					cameraState = shot.GetState(timeInClip, clipDuration);
 
 					PathPosition nodePos = path.GetPoint(path.GetPathT(path._nodes[nodeIndex]._node));
 					rotationToPath = Quaternion.FromToRotation(nodePos._pathForward, shot.transform.forward);

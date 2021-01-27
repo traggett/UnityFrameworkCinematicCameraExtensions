@@ -18,13 +18,13 @@ namespace Framework
 				private SerializedProperty _fieldOfViewProperty;
 				private SerializedProperty _cameraRectProperty;
 				private SerializedProperty _focusInfoProperty;
+				private SerializedProperty _durationProperty;
 
 				private SerializedProperty _shotTypeProperty;
 				private SerializedProperty _shotModifiersProperty;
 
 				private SerializedProperty _previewCameraProperty;
 				private SerializedProperty _previewUsingAllCamerasProperty;
-				private SerializedProperty _previewDurationProperty;
 				private SerializedProperty _previewClipExtrapolationProperty;
 
 				private static readonly float kMouseLookSpeed = 82.0f;
@@ -32,11 +32,10 @@ namespace Framework
 				private static readonly float kFastMovementSpeed = 0.16f;
 				private static readonly bool[] _mouseDown = new bool[3];
 				private static CinematicCameraState _originalCameraState;
-				private static bool _preview;
 				private static CinematicCameraShotInspector _previewShot;
 				private static RenderTexture _targetTexture;
 				private static Dictionary<KeyCode, bool> _buttonPressed = new Dictionary<KeyCode, bool>();
-				private static float _previewClipTime;
+
 
 				#region Editor Calls
 				private void OnEnable()
@@ -44,12 +43,12 @@ namespace Framework
 					_fieldOfViewProperty = serializedObject.FindProperty("_fieldOfView");
 					_cameraRectProperty = serializedObject.FindProperty("_cameraRect");
 					_focusInfoProperty = serializedObject.FindProperty("_focusInfo");
+					_durationProperty = serializedObject.FindProperty("_defaultDuration");
 
 					_shotModifiersProperty = serializedObject.FindProperty("_cinematicCameraShotModifiers");
 
 					_previewCameraProperty = serializedObject.FindProperty("_previewCamera");
-					_previewUsingAllCamerasProperty = serializedObject.FindProperty("_previewUsingAllCameras");
-					_previewDurationProperty = serializedObject.FindProperty("_previewClipDuration");
+					_previewUsingAllCamerasProperty = serializedObject.FindProperty("_previewUsingAllCameras");			
 					_previewClipExtrapolationProperty = serializedObject.FindProperty("_previewClipExtrapolation");
 				}
 
@@ -71,6 +70,7 @@ namespace Framework
 					EditorGUILayout.PropertyField(_fieldOfViewProperty);
 					EditorGUILayout.PropertyField(_cameraRectProperty);
 					EditorGUILayout.PropertyField(_focusInfoProperty);
+					EditorGUILayout.PropertyField(_durationProperty);
 
 					EditorGUILayout.Separator();
 					EditorGUILayout.LabelField("<b>Modifiers</b>", EditorUtils.InspectorSubHeaderStyle);
@@ -89,24 +89,24 @@ namespace Framework
 					if (EditorGUI.EndChangeCheck())
 					{
 						//If changed to new camera, set old cameras state back to orig
-						if (oldPreviewCamera != null && _preview)
+						if (oldPreviewCamera != null && CinematicCameraShot._preview)
 						{
 							oldPreviewCamera.SetState(_originalCameraState);
 						}
-						_preview = false;
+						 CinematicCameraShot._preview = false;
 
 						previewCamera = (CinematicCamera)_previewCameraProperty.objectReferenceValue;
 					}
 
-					EditorGUILayout.PropertyField(_previewDurationProperty);
+					
 					EditorGUILayout.PropertyField(_previewClipExtrapolationProperty);
 
 					if (previewCamera != null)
 					{
 						EditorGUILayout.Separator();
-						if (GUILayout.Button("Preview Shot", _preview ? EditorUtils.ToggleButtonToggledStyle : EditorUtils.ToggleButtonStyle, GUILayout.ExpandWidth(false)))
+						if (GUILayout.Button("Preview Shot",  CinematicCameraShot._preview ? EditorUtils.ToggleButtonToggledStyle : EditorUtils.ToggleButtonStyle, GUILayout.ExpandWidth(false)))
 						{
-							if (!_preview)
+							if (!CinematicCameraShot._preview)
 							{
 								StartPreviewing(this);
 							}
@@ -119,7 +119,7 @@ namespace Framework
 					}
 					else
 					{
-						_preview = false;
+						 CinematicCameraShot._preview = false;
 					}
 
 					serializedObject.ApplyModifiedProperties();
@@ -127,7 +127,7 @@ namespace Framework
 
 				public virtual void OnSceneGUI()
 				{
-					if (_preview && Event.current != null)
+					if (CinematicCameraShot._preview && Event.current != null)
 					{
 						switch (Event.current.type)
 						{
@@ -144,15 +144,14 @@ namespace Framework
 
 				private static void StartPreviewing(CinematicCameraShotInspector inspector)
 				{
-					if (!_preview)
+					if (!CinematicCameraShot._preview)
 					{
 						CinematicCamera previewCamera = (CinematicCamera)inspector._previewCameraProperty.objectReferenceValue;
 						_originalCameraState = previewCamera.GetState();
 						EditorApplication.update += UpdateKeys;
 						EditorSceneManager.sceneSaving += OnSaveScene;
-						_preview = true;
+						CinematicCameraShot._preview = true;
 						_previewShot = inspector;
-						_previewClipTime = 0.0f;
 
 						 RefreshSceneView();
 					}
@@ -160,14 +159,14 @@ namespace Framework
 
 				private static void StopPreviewing()
 				{
-					if (_preview)
+					if (CinematicCameraShot._preview)
 					{
 						EditorApplication.update -= UpdateKeys;
 
 						CinematicCamera previewCamera = (CinematicCamera)_previewShot._previewCameraProperty.objectReferenceValue;
 						previewCamera.SetState(_originalCameraState);
 
-						_preview = false;
+						CinematicCameraShot._preview = false;
 						_previewShot = null;
 
 						//Force refresh the scene view
@@ -180,7 +179,7 @@ namespace Framework
 				{
 					CinematicCamera previewCamera = (CinematicCamera)_previewCameraProperty.objectReferenceValue;
 
-					if (_preview && previewCamera != null)
+					if (CinematicCameraShot._preview && previewCamera != null)
 					{
 						CinematicCameraShot shot = (CinematicCameraShot)target;
 
@@ -188,9 +187,7 @@ namespace Framework
 						Vector2 gameViewRes = GetMainGameViewSize();
 						float aspectRatio = gameViewRes.x / gameViewRes.y;
 
-
-						float clipPosition = CinematicCameraMixer.GetClipPosition(shot._previewClipExtrapolation, _previewClipTime, shot._previewClipDuration);
-						previewCamera.SetState(shot.GetState(clipPosition));
+						previewCamera.SetState(shot.GetState());
 
 						Rect sceneViewRect = Camera.current.pixelRect;
 
@@ -352,13 +349,11 @@ namespace Framework
 
 				private static bool InFreeCamMode()
 				{
-					return _preview && _previewShot != null && _mouseDown[1];
+					return CinematicCameraShot._preview && _previewShot != null && _mouseDown[1];
 				}
 
 				private static void UpdateKeys()
 				{
-					_previewClipTime += Time.deltaTime;
-
 					if (InFreeCamMode())
 					{
 						Vector3 movement = Vector3.zero;

@@ -13,6 +13,7 @@ namespace Framework
 			public float _fieldOfView = 60.0f;
 			public Rect _cameraRect = new Rect(0, 0, 1, 1);
 			public CinematicCameraFocusInfo _focusInfo = CinematicCameraFocusInfo.kDefault;
+			public float _defaultDuration = 1f;
 			public CinematicCameraShotModifier[] _cinematicCameraShotModifiers;
 
 			#region Previewing
@@ -22,9 +23,8 @@ namespace Framework
 			[HideInInspector]
 			public bool _previewUsingAllCameras;
 			[HideInInspector]
-			public float _previewClipDuration;
-			[HideInInspector]
 			public Extrapolation _previewClipExtrapolation;
+			public static bool _preview;
 #endif
 			#endregion
 
@@ -47,11 +47,16 @@ namespace Framework
 			{
 				Gizmos.DrawIcon(transform.position, "CameraShotIcon", true);
 			}
+
+			public static bool IsPreviewing()
+			{
+				return _preview;
+			}
 #endif
 			#endregion
 
 			#region Public Functions
-			public CinematicCameraState GetState(float clipPosition = 0.0f)
+			public CinematicCameraState GetState(float shotTime = 0.0f, float shotDuration = -1f)
 			{
 				//Get default state
 				CinematicCameraState state = new CinematicCameraState
@@ -66,7 +71,7 @@ namespace Framework
 				//Apply modifiers
 				for (int i=0; i<_cinematicCameraShotModifiers.Length; i++)
 				{
-					_cinematicCameraShotModifiers[i].ModifiyState(ref state, clipPosition);
+					_cinematicCameraShotModifiers[i].ModifiyState(ref state, shotTime, shotDuration);
 				}
 
 				return state;
