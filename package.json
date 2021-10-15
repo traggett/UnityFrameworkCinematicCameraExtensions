@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "com.clarky.unityframework"": "1.0.0"
+    "com.clarky.unityframework": "1.0.0"
 	},
   "displayName": "Unity Framework Cinematic Camera extensions",
   "description": "Cinematic Camera extensions for Unity Framework",
