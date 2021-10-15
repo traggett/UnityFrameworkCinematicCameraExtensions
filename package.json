@@ -1,11 +1,11 @@
 {
-  "name": "com.clarky.unityframework.cinematiccameraextensions",
+  "name": "com.clarky.unityframework.cinematiccamera",
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
     "com.clarky.unityframework"": "1.0.0"
 	},
-  "displayName": "Unity Framework Cinematic Camera Extensions",
+  "displayName": "Unity Framework Cinematic Camera extensions",
   "description": "Cinematic Camera extensions for Unity Framework",
   "unity": "2020.1",
   "author": "Clarky Cat (https://github.com/traggett)"
