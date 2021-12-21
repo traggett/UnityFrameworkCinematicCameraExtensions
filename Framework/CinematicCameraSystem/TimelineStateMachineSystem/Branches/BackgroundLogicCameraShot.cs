@@ -36,7 +36,7 @@ namespace Framework
 
 				if (camera != null && cameraShot != null)
 				{
-					camera.StartCameraShot(cameraShot, _extrapolation, _blendTime, _blendEaseType);
+					camera.Play(cameraShot, _extrapolation, _blendTime, _blendEaseType);
 				}
 			}
 
@@ -47,7 +47,7 @@ namespace Framework
 
 				if (camera != null && cameraShot != null)
 				{
-					camera.StopCameraShot(cameraShot);
+					camera.Stop(cameraShot);
 				}
 			}
 

@@ -38,7 +38,7 @@ namespace Framework
 			private CinematicCameraState _currentState;
 			#endregion
 
-			#region MonoBehaviour
+			#region Unity Messages
 			void Update()
 			{
 				if (_currentShot._shot != null)
@@ -93,7 +93,7 @@ namespace Framework
 			#endregion
 
 			#region Public Functions
-			public void StartCameraShot(CinematicCameraShot shot, Extrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
+			public void Play(CinematicCameraShot shot, Extrapolation extrapolation, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
 			{
 				if (blendTime <= 0.0f)
 				{
@@ -118,7 +118,7 @@ namespace Framework
 				_currentShot._time = 0.0f;
 			}
 
-			public void StopCameraShot(CinematicCameraShot shot, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
+			public void Stop(CinematicCameraShot shot, float blendTime = -1.0f, InterpolationType blendType = InterpolationType.InOutCubic)
 			{
 				if (_currentShot._shot != null && _currentShot._shot == shot)
 				{

@@ -30,7 +30,7 @@ namespace Framework
 
 			#endregion
 
-			#region MonoBehaviour
+			#region Unity Messages
 			void Update()
 			{
 #if UNITY_EDITOR
