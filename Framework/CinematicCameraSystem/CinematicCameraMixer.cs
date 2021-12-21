@@ -38,11 +38,6 @@ namespace Framework
 			private CinematicCameraState _currentState;
 			#endregion
 
-			public CinematicCameraState GetCameraState()
-			{
-				return _currentState;
-			}
-
 			#region MonoBehaviour
 			void Update()
 			{
@@ -163,6 +158,11 @@ namespace Framework
 
 					_currentShot = new ShotInfo();
 				}
+			}
+
+			public CinematicCameraState GetMixerState()
+			{
+				return _currentState;
 			}
 
 			public static float GetClipPosition(Extrapolation extrapolation, float time, float duration)

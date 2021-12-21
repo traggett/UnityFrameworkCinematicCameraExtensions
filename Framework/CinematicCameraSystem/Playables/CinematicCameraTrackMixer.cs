@@ -13,7 +13,7 @@ namespace Framework
 		{
 			private CinematicCameraTrack _trackAsset;
 			private PlayableDirector _director;
-			private CinematicCameraState _defaultState;
+			private CinematicCameraState _boundState;
 			private CinematicCamera _trackBinding;
 			private CinematicCameraMixer _cameraMixer;
 			private bool _firstFrameHappened;
@@ -33,7 +33,7 @@ namespace Framework
 
 				if (!_firstFrameHappened)
 				{
-					_defaultState = _trackBinding.GetState();
+					_boundState = _trackBinding.GetState();
 					_cameraMixer = _trackBinding.GetComponent<CinematicCameraMixer>();
 					_firstFrameHappened = true;
 				}
@@ -133,10 +133,10 @@ namespace Framework
 					}
 				}
 
+				CinematicCameraState blendedState = GetDefaultState();
+
 				if (totalWeights > 0.0f)
 				{
-					CinematicCameraState blendedState = GetDefaultState();
-
 					float weightAdjust = 1.0f / totalWeights;
 					bool firstBlend = true;
 
@@ -155,13 +155,9 @@ namespace Framework
 							}
 						}
 					}
+				}
 
-					_trackBinding.SetState(blendedState);
-				}
-				else
-				{
-					_trackBinding.SetState(GetDefaultState());
-				}
+				_trackBinding.SetState(blendedState);
 			}
 
 			public override void OnGraphStop(Playable playable)
@@ -216,11 +212,12 @@ namespace Framework
 				//If a camera mixer is active get its state
 				if (_cameraMixer != null && _cameraMixer.isActiveAndEnabled)
 				{
-					return _cameraMixer.GetCameraState();
+					return _cameraMixer.GetMixerState();
 				}
+				//Otherwise use the state the camera was in when bound
 				else
 				{
-					return _defaultState;
+					return _boundState;
 				}
 			}
 
