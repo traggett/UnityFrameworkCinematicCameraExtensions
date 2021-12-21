@@ -92,6 +92,11 @@ namespace Framework
 				{
 					_currentShot._weight = 1.0f;
 					_blendingShots = new ShotInfo[0];
+
+					if (shot != null)
+					{
+						_camera.SetState(shot.GetState());
+					}
 				}
 				else if (_currentShot._shot != null)
 				{
