@@ -35,7 +35,13 @@ namespace Framework
 			private float _currentShotBlendSpeed;
 
 			private ShotInfo[] _blendingShots;
+			private CinematicCameraState _currentState;
 			#endregion
+
+			public CinematicCameraState GetCameraState()
+			{
+				return _currentState;
+			}
 
 			#region MonoBehaviour
 			void Update()
@@ -52,7 +58,7 @@ namespace Framework
 
 				if (_currentShot._shot != null && _currentShot._weight >= 1.0f)
 				{
-					_camera.SetState(_currentShot.GetState());
+					_currentState = _currentShot.GetState();
 				}
 				else if (_blendingShots != null && _blendingShots.Length > 0 || _currentShot._shot != null)
 				{
@@ -80,8 +86,14 @@ namespace Framework
 						blendedState = CinematicCameraState.Interpolate(_camera, blendedState, _currentShot.GetState(), _currentShot._blendType, _currentShot._weight);
 					}
 
-					_camera.SetState(blendedState);
+					_currentState = blendedState;
 				}
+				else
+				{
+					_currentState = _camera.GetState();
+				}
+
+				_camera.SetState(_currentState);
 			}
 			#endregion
 

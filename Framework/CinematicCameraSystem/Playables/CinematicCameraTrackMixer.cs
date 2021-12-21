@@ -15,6 +15,7 @@ namespace Framework
 			private PlayableDirector _director;
 			private CinematicCameraState _defaultState;
 			private CinematicCamera _trackBinding;
+			private CinematicCameraMixer _cameraMixer;
 			private bool _firstFrameHappened;
 
 			public void SetTrackAsset(TrackAsset trackAsset, PlayableDirector director)
@@ -33,6 +34,7 @@ namespace Framework
 				if (!_firstFrameHappened)
 				{
 					_defaultState = _trackBinding.GetState();
+					_cameraMixer = _trackBinding.GetComponent<CinematicCameraMixer>();
 					_firstFrameHappened = true;
 				}
 				
@@ -99,24 +101,20 @@ namespace Framework
 										if (sectionT <= 0f)
 										{
 											states[i] = startNodeState;
-											//cameraForward = startNodeFromTo * pos._pathForward;
+											
 											cameraForward = startNodeCamFor;
 											cameraUp = startNodeCamUp;
 										}
 										else if (sectionT >= 1f)
 										{
 											states[i] = endNodeState;
-											//cameraForward = endNodeFromTo * pos._pathForward;
+											
 											cameraForward = endNodeCamFor;
 											cameraUp = endNodeCamUp;
 										}
 										else
 										{
 											states[i] = CinematicCameraState.Interpolate(_trackBinding, startNodeState, endNodeState, InterpolationType.Linear, sectionT);
-
-											//Work out rotation based on 
-											Quaternion cameraRotation = Quaternion.Slerp(startNodeFromTo, endNodeFromTo, sectionT);
-											cameraForward = cameraRotation * pos._pathForward;
 
 											cameraForward = Vector3.Lerp(startNodeCamFor, endNodeCamFor, sectionT);
 											cameraUp = Vector3.Lerp(startNodeCamUp, endNodeCamUp, sectionT);
@@ -126,8 +124,6 @@ namespace Framework
 										//Set camera position from path pos
 										states[i]._position = pos._pathPosition;
 										states[i]._rotation = Quaternion.LookRotation(cameraForward, cameraUp);
-
-
 									}
 									
 									totalWeights += inputWeights[i];
@@ -139,7 +135,7 @@ namespace Framework
 
 				if (totalWeights > 0.0f)
 				{
-					CinematicCameraState blendedState = _defaultState;
+					CinematicCameraState blendedState = GetDefaultState();
 
 					float weightAdjust = 1.0f / totalWeights;
 					bool firstBlend = true;
@@ -164,14 +160,14 @@ namespace Framework
 				}
 				else
 				{
-					_trackBinding.SetState(_defaultState);
+					_trackBinding.SetState(GetDefaultState());
 				}
 			}
 
 			public override void OnGraphStop(Playable playable)
 			{
 				if (_trackBinding != null)
-					_trackBinding.SetState(_defaultState);
+					_trackBinding.SetState(GetDefaultState());
 				
 				_firstFrameHappened = false;
 			}
@@ -214,6 +210,20 @@ namespace Framework
 					upDir = Vector3.up;
 				}
 			}
+
+			private CinematicCameraState GetDefaultState()
+			{
+				//If a camera mixer is active get its state
+				if (_cameraMixer != null && _cameraMixer.isActiveAndEnabled)
+				{
+					return _cameraMixer.GetCameraState();
+				}
+				else
+				{
+					return _defaultState;
+				}
+			}
+
 		}
 	}
 }
