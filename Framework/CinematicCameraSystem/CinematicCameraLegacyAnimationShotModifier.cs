@@ -3,7 +3,7 @@ using System;
 
 namespace Framework
 {
-	using AnimationSystem;
+	using Animations;
 	using Maths;
 	
 	namespace CinematicCameraSystem
